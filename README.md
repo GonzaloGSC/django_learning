@@ -80,6 +80,21 @@ Para instalar las dependencias del proyecto, se utiliza el siguiente comando:
 ```
 pip install -r requirements.txt
 ```
+Installed apps en settings.py:
+```
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',
+    'django_filters',
+    'corsheaders',
+    'django_extensions',
+]
+```
 [Volver al Índice 🔝](#índice)
 ### <span style="color: #6E7316; font-weight: bold;">djangorestframework</span>
 Django REST framework es una librería de Python que se utiliza para crear APIs (Application Programming Interfaces, o Interfaces de Programación de Aplicaciones) en aplicaciones web desarrolladas con Django. Una API es un conjunto de funcionalidades que se exponen a través de una interfaz de programación y que permiten que otras aplicaciones puedan interactuar con ellas de forma automatizada.
