@@ -36,6 +36,7 @@ En la actualidad, Django se utiliza en una amplia variedad de proyectos, desde p
     - [Intermedio](#intermedio)
     - [Avanzado](#avanzado)
 - [Testing](#testing)
+- [Deploy](#deploy)
 # <span style="color: #F5FF30; font-weight: bold;">Utiles</span>
 ## <span style="color: #D0D929; font-weight: bold;">Virtualenv</span>
 ### <span style="color: #6E7316; font-weight: bold;">Crear</span>
@@ -250,3 +251,206 @@ python manage.py runserver
 
 [Volver al Índice 🔝](#índice)
 # <span style="color: #F5FF30; font-weight: bold;">Testing</span>
+[Volver al Índice 🔝](#índice)
+# <span style="color: #F5FF30; font-weight: bold;">Deploy</span>
+
+Utilizar idealmente AWS EC2 para crear maquina Ubuntu.
+
+Comandos de preparación maquina:
+```
+sudo apt-get update
+sudo apt-get install git python3.10 python3-pip virtualenv libpq-dev postgresql postgresql-contrib nginx net-tools -y
+```
+Comandos para preparación de BDD postgresql:
+```
+sudo su postgres
+psql
+CREATE DATABASE db_name;
+CREATE USER user_name WITH PASSWORD 'password'; 
+ALTER USER user_name WITH PASSWORD 'password';
+ALTER ROLE user_name SET client_encoding TO 'utf8';
+ALTER ROLE user_name SET default_transaction_isolation TO 'read committed';
+ALTER ROLE user_name SET timezone TO 'UTC';
+GRANT ALL PRIVILEGES ON DATABASE db_name TO user_name;
+\q
+exit
+```
+Comandos para proyecto:
+```
+git clone https://GonzaloGSC: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@github.com/GonzaloGSC/bet_detector_api.git
+cd path/to/bet_detector_api
+virtualenv env
+source env/bin/activate
+pip install -r requirements_prod.txt
+```
+Siguientes pasos:
+
+- Colocar .env en carpeta backend o core del proyecto.
+- Editar .env añadiendo la public_ip en ALLOWED_HOSTS.
+- python manage.py migrate
+- python manage.py collectstatic
+- python manage.py runserver 0.0.0.0:8000  (ver con http://public_ip:8000/)
+- press CTRL + C to stop testing.
+- gunicorn --bind 0.0.0.0:8000 myproject.wsgi
+- press CTRL + C to stop testing.
+
+Comandos para gunicorn:
+
+- sudo gpasswd -a nombreUsuario nombreGrupo (añadir usuario linux al grupo www-data, https://www.zeppelinux.es/como-agregar-un-usuario-a-un-grupo-en-linux/)
+- sudo nano /etc/systemd/system/gunicorn.socket
+  
+Archivo gunicorn.socket:
+```
+[Unit]
+Description=gunicorn socket
+
+[Socket]
+ListenStream=/run/gunicorn.sock
+
+[Install]
+WantedBy=sockets.target
+```
+- sudo nano /etc/systemd/system/gunicorn.service
+
+Archivo gunicorn.service:
+```
+[Unit]
+Description=gunicorn daemon
+Requires=gunicorn.socket
+After=network.target
+
+[Service]
+User=nombreUsuario
+Group=www-data
+WorkingDirectory=/home/ubuntu/carpeta_proyecto
+EnvironmentFile=/home/ubuntu/carpeta_proyecto/backend/.env
+ExecStart=/home/ubuntu/carpeta_proyecto/env/bin/gunicorn \
+          --access-logfile - \
+          --workers 3 \
+          --bind unix:/run/gunicorn.sock \
+          carpeta_proyecto_wsgi.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
+```
+Cambiar propetario de archivos creados con chown USER:GROUP FILE:
+```
+chown ubuntu:www-data /etc/systemd/system/gunicorn.service
+chown ubuntu:www-data /etc/systemd/system/gunicorn.socket
+chown ubuntu:www-data -R /home/ubuntu/bet_detector_api/
+```
+Ahora puede iniciar y habilitar el zócalo Gunicorn. Esto creará el archivo de socket ahora /run/gunicorn.socky en el arranque. 
+Cuando se realiza una conexión a ese socket, systemd iniciará automáticamente gunicorn.servicepara manejarlo:
+```
+sudo systemctl start gunicorn.socket
+sudo systemctl enable gunicorn.socket
+```
+Verifique el estado del proceso para saber si se pudo iniciar:
+```
+sudo systemctl status gunicorn.socket
+```
+A continuación, verifique la existencia del gunicorn.sockarchivo dentro del /rundirectorio:
+```
+file /run/gunicorn.sock
+```
+Output
+/run/gunicorn.sock: socket
+
+Para probar el mecanismo de activación del socket, puede enviar una conexión al socket curlescribiendo:
+```
+curl --unix-socket /run/gunicorn.sock localhost
+```
+En caso de errores, vea las siguientes opciones: 
+```
+sudo journalctl -u gunicorn.socket
+sudo journalctl -u gunicorn.service -b -e -n 50
+sudo tail -f /var/log/gunicorn/access.log
+```
+Revise su /etc/systemd/system/gunicorn.service archivo en busca de problemas. 
+Si realiza cambios en el /etc/systemd/system/gunicorn.servicearchivo, vuelva a cargar el demonio 
+para volver a leer la definición del servicio y reinicie el proceso de Gunicorn escribiendo:
+```
+sudo systemctl daemon-reload
+sudo systemctl restart gunicorn
+```
+Comandos para Nginx:
+
+Comience por crear y abrir un nuevo bloque de servidor en el sites-available directorio de Nginx:
+```
+sudo nano /etc/nginx/sites-available/nombre_archivo
+```
+Archivo bloque de servidor:
+```
+server {
+    listen 80;
+    listen [::]:80;
+    server_name 15.228.235.226;
+
+    location /favicon.ico {
+        access_log off;
+        log_not_found off;
+    }
+
+    location /static {
+        alias /var/www/html/;
+    }
+
+    location /media {
+        alias /home/ubuntu/carpeta_proyecto/media/;
+    }
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/run/gunicorn.sock;
+        proxy_redirect off;
+        add_header P3P 'CP="ALL DSP COR PSAa OUR NOR ONL UNI COM NAV"';
+        add_header Access-Control-Allow-Origin *;
+    }
+}
+```
+Editar archivo proxy_params:
+```
+sudo nano /etc/nginx/proxy_params
+```
+Archivo proxy_params:
+```
+proxy_set_header Host $http_host;
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+proxy_set_header X-Forwarded-Proto $scheme;
+proxy_set_header X-Forwarded-Host $server_name;
+```
+Ahora, puede habilitar el archivo vinculándolo al sites-enableddirectorio:
+```
+sudo ln -s /etc/nginx/sites-available/nombre_archivo /etc/nginx/sites-enabled
+```
+Pruebe su configuración de Nginx en busca de errores de sintaxis escribiendo:
+```
+sudo nginx -t
+```
+Si existen errores:
+```
+sudo tail -F /var/log/nginx/error.log
+```
+Si no se informan errores, continúe y reinicie Nginx escribiendo:
+```
+sudo systemctl restart nginx
+```
+Finalmente, debe abrir su firewall al tráfico normal en el puerto 80. Dado que ya no necesita acceso al servidor de desarrollo, también puede eliminar la regla para abrir el puerto 8000:
+```
+sudo ufw delete allow 8000
+sudo ufw allow 'Nginx Full'
+```
+Ahora debería poder ir al dominio o dirección IP de su servidor para ver su aplicación.
+
+Comados para full reset:
+```
+sudo systemctl daemon-reload
+sudo systemctl restart gunicorn
+sudo systemctl restart gunicorn.socket gunicorn.service
+sudo nginx -t && sudo systemctl restart nginx
+```
+
+Fuente: [Link](https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-22-04)
+
+[Volver al Índice 🔝](#índice)
