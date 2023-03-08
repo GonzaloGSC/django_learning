@@ -1,0 +1,148 @@
+{
+    "explorer.confirmDragAndDrop": false,
+    "explorer.confirmDelete": false,
+    "workbench.editorAssociations": {
+        "*.ipynb": "jupyter-notebook"
+    },
+    "python.defaultInterpreterPath": "C:\\Python38\\python.exe",
+    "terminal.integrated.defaultProfile.windows": "Git Bash",
+    "terminal.integrated.profiles.windows": {
+
+        "PowerShell": {
+            "source": "PowerShell",
+            "icon": "terminal-powershell"
+        },
+        "Command Prompt": {
+            "path": [
+                "${env:windir}\\Sysnative\\cmd.exe",
+                "${env:windir}\\System32\\cmd.exe"
+            ],
+            "args": [],
+            "icon": "terminal-cmd"
+        },
+        "Git Bash": {
+            "source": "Git Bash"
+        },
+        "cmd.exe": {
+            "path": "C:\\Windows\\System32\\cmd.exe",
+            "args": []
+        },
+        "C:\\Program Files\\Git\\bin\\bash.exe (migrated)": {
+            "path": "C:\\Program Files\\Git\\bin\\bash.exe",
+            "args": []
+        }
+    },
+    "security.workspace.trust.untrustedFiles": "open",
+    "notebook.cellToolbarLocation": {
+        "default": "right",
+        "jupyter-notebook": "left"
+    },
+    "editor.detectIndentation": false,
+    "terminal.integrated.enableMultiLinePasteWarning": false,
+    "workbench.colorTheme": "Bearded Theme Arc",
+    "editor.tokenColorCustomizations": {
+        "comments": "#88f8a6",
+        "strings": "#ff9a2e",
+        "textMateRules": [
+            {
+                "scope": "punctuation.definition.comment",
+                "settings": {
+                    "foreground": "#6eff94"
+                }
+            },
+            {
+                "scope": [
+                    "punctuation.definition.string.begin",
+                    "punctuation.definition.string.end",
+                    "string.quoted.single"
+                ],
+                "settings": {
+                    "foreground": "#ff9a2e",
+                }
+            },
+            {
+                "scope": [
+                    "meta.function-call.python",
+                    "entity.name.function"
+                ],
+                "settings": {
+                    "foreground": "#d0ff00",
+                }
+            },
+            {
+                "scope": [
+                    // "storage.type.function",
+                    // "storage.type.function.python",
+                    // "meta.function.python",
+                    // "meta.function.parameters.python",
+                    // "string.quoted.single.python",
+                    // "source.python",
+                    // "keyword.control",
+                ],
+                "settings": {
+                    "foreground": "#ff89f7",
+                }
+            },
+            {
+                "scope": [
+                    "punctuation",
+                    "punctuation.separator",
+                    "punctuation.definition.list.end.python",
+                    "punctuation.definition.list.begin.python",
+                    "punctuation.definition.parameters",
+                    "punctuation.definition.parameters.end.python",
+                    "punctuation.definition.parameters.begin.python",
+                    "punctuation.definition.arguments.end.python",
+                    "punctuation.definition.arguments.begin.python",
+                    "punctuation.parenthesis.end.python",
+                    "punctuation.parenthesis.begin.python",
+                    "meta.function-call.python",
+                ],
+                "settings": {
+                    "foreground": "#ffff",
+                }
+            },
+            {
+                "scope": [
+                    "keyword.operator"
+                ],
+                "settings": {
+                    "foreground": "#FFD866",
+                }
+            },
+            {
+                "scope": [
+                    "constant.numeric"
+                ],
+                "settings": {
+                    "foreground": "#78E8C6",
+                }
+            },
+        ],
+    },
+    "workbench.colorCustomizations": {
+        // "editor.selectionBackground": "#ffffff4f",
+        // "editor.selectionHighlightBackground": "#ffffff5e",
+        "editorCursor.foreground": "#ffff00",
+        "terminalCursor.foreground": "#ffff00",
+    },
+    "editor.fontSize": 16,
+    "scm.inputFontSize": 16,
+    "markdown.preview.fontSize": 16,
+    "terminal.integrated.fontSize": 16,
+    "workbench.iconTheme": "bearded-icons",
+    "[css]": {
+        "editor.defaultFormatter": "vscode.css-language-features"
+    },
+    "[scss]": {
+        "editor.defaultFormatter": "sibiraj-s.vscode-scss-formatter"
+    },
+    "git.enableSmartCommit": true,
+    "[python]": {
+    },
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "liveServer.settings.donotShowInfoMsg": true,
+    "editor.tabCompletion": "on",
+    "liveServer.settings.donotVerifyTags": true,
+    "terminal.integrated.localEchoStyle": "dim",
+}
