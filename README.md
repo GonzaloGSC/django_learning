@@ -277,7 +277,7 @@ exit
 ```
 Comandos para proyecto:
 ```
-git clone https://GonzaloGSC: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@github.com/GonzaloGSC/bet_detector_api.git
+git clone https://GonzaloGSC:TOKEN@github.com/GonzaloGSC/bet_detector_api.git
 cd path/to/bet_detector_api
 virtualenv env
 source env/bin/activate
