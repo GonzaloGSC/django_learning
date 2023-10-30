@@ -254,27 +254,48 @@ python manage.py runserver
 [Volver al Índice 🔝](#índice)
 # <span style="color: #F5FF30; font-weight: bold;">Deploy</span>
 
-Utilizar idealmente AWS EC2 para crear maquina Ubuntu.
-
-Comandos de preparación maquina:
+Comandos de preparación maquina (Debian Ubuntu):
 ```
 sudo apt-get update
-sudo apt-get install git python3.10 python3-pip virtualenv libpq-dev postgresql postgresql-contrib nginx net-tools -y
+sudo apt-get install git python3.11 python3-pip virtualenv libpq-dev postgresql postgresql-contrib nginx net-tools -y
+```
+Comandos de preparación maquina (Amazon Linux):
+```
+sudo yum update
+sudo yum install git python3.11 python3.11-pip python3.11-devel nginx net-tools -y
+python3.11 -m pip install virtualenv
+sudo dnf install postgresql15.x86_64 postgresql15-server -y
+```
+Comandos para preparación de BDD postgresql (Amazon Linux):
+```
+sudo postgresql-setup --initdb
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+sudo systemctl status postgresql
+```
+```
+sudo passwd postgres
+su - postgres
 ```
 Comandos para preparación de BDD postgresql:
 ```
 sudo su postgres
 psql
 CREATE DATABASE db_name;
-CREATE USER user_name WITH PASSWORD 'password'; 
+CREATE USER user_name WITH PASSWORD 'password';
 ALTER USER user_name WITH PASSWORD 'password';
 ALTER ROLE user_name SET client_encoding TO 'utf8';
 ALTER ROLE user_name SET default_transaction_isolation TO 'read committed';
 ALTER ROLE user_name SET timezone TO 'UTC';
+ALTER DATABASE db_name OWNER TO user_name;
 GRANT ALL PRIVILEGES ON DATABASE db_name TO user_name;
 \q
 exit
 ```
+
+Info: https://linux.how2shout.com/how-to-install-postgresql-15-amazon-linux-2023/
+Info: https://stackoverflow.com/questions/11339917/django-operationalerror-fatal-ident-authentication-failed-for-user-usernam
+
 Comandos para proyecto:
 ```
 git clone https://GonzaloGSC:TOKEN@github.com/GonzaloGSC/bet_detector_api.git
@@ -420,7 +441,7 @@ proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 proxy_set_header X-Forwarded-Proto $scheme;
 proxy_set_header X-Forwarded-Host $server_name;
 ```
-Ahora, puede habilitar el archivo vinculándolo al sites-enableddirectorio:
+Ahora, puede habilitar el archivo vinculándolo al sites-enabled directorio:
 ```
 sudo ln -s /etc/nginx/sites-available/nombre_archivo /etc/nginx/sites-enabled
 ```
